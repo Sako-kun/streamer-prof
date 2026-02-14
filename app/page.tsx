@@ -1,65 +1,75 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
 
 export default function Home() {
+  // ユーザーの入力を管理する「状態(State)」
+  const [name, setName] = useState("ここに名前");
+  const [hobby, setHobby] = useState("ここに趣味");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="min-h-screen bg-gray-100 p-4 flex flex-col items-center gap-6">
+      <h1 className="text-2xl font-bold text-gray-800">ストリーマープロフ帳</h1>
+
+      {/* --- 入力エリア --- */}
+      <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md flex flex-col gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">なまえ</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">しゅみ</label>
+          <input
+            type="text"
+            value={hobby}
+            onChange={(e) => setHobby(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+          />
+        </div>
+      </div>
+
+      {/* --- 画像プレビューエリア --- */}
+      {/* この id="profile-card" の中身を後で画像化します */}
+      <div 
+        id="profile-card"
+        className="relative shadow-2xl overflow-hidden"
+        style={{ width: "400px", height: "560px" }} // 画像の比率に合わせて調整
+      >
+        {/* 背景のテンプレート画像 */}
+        <img 
+          src="/template.png" 
+          alt="profu-template" 
+          className="absolute inset-0 w-full h-full object-contain"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+
+        {/* 重ねるテキスト：名前 */}
+        <div 
+          className="absolute text-xl font-bold text-gray-800"
+          style={{ 
+            top: "20%",  // 画像の上から20%の位置（適宜調整）
+            left: "30%", // 画像の左から30%の位置（適宜調整）
+          }}
+        >
+          {name}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* 重ねるテキスト：趣味 */}
+        <div 
+          className="absolute text-lg text-gray-700"
+          style={{ 
+            top: "45%", 
+            left: "30%", 
+          }}
+        >
+          {hobby}
         </div>
-      </main>
-    </div>
+      </div>
+      
+      <p className="text-sm text-gray-500">※位置がズレている場合は top/left の % を調整してください</p>
+    </main>
   );
 }
