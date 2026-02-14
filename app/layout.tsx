@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Kiwi_Maru } from "next/font/google";
+
+const kiwiMaru = Kiwi_Maru({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-kiwi-maru"
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +30,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${kiwiMaru.variable} antialiased`}
       >
         {children}
       </body>

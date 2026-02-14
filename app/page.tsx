@@ -5,16 +5,17 @@ import { toPng } from "html-to-image";
 export default function Home() {
   // ユーザーの入力を管理する「状態(State)」
   const [name, setName] = useState("ここに名前");
-  const [hobby, setHobby] = useState("ここに趣味");
+  const [like, setLike] = useState("ここに好きなもの");
+  const [hate, setHate] = useState("ここに嫌いなもの");
 
   const elementRef = useRef<HTMLDivElement>(null);
   const onDownload = async () => {
     if (elementRef.current === null) return;
 
-try {
+    try {
       // プレビューエリアをPNGデータに変換
-      const dataUrl = await toPng(elementRef.current, { cacheBust: true, pixelRatio: 2});
-      
+      const dataUrl = await toPng(elementRef.current, { cacheBust: true, pixelRatio: 2 });
+
       // ダウンロード用のリンクを作ってクリックさせる
       const link = document.createElement("a");
       link.download = "my-profile.png";
@@ -41,54 +42,71 @@ try {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">しゅみ</label>
+          <label className="block text-sm font-medium text-gray-700">すき</label>
           <input
             type="text"
-            value={hobby}
-            onChange={(e) => setHobby(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black"
+            value={like}
+            onChange={(e) => setLike(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">きらい</label>
+          <input
+            type="text"
+            value={hate}
+            onChange={(e) => setHate(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-black focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <button
-        onClick={onDownload}
-        className="bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition"
+          onClick={onDownload}
+          className="bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition"
         >画像をダウンロード</button>
       </div>
 
       {/* --- 画像プレビューエリア --- */}
       {/* この id="profile-card" の中身を後で画像化します */}
-      <div 
-        ref={elementRef} id="profile-card"
+      <div
+        ref={elementRef}
         className="relative shadow-2xl overflow-hidden"
-        style={{ width: "1200px", height: "675px" }} // 画像の比率に合わせて調整
+        style={{ width: "810px", height: "1440px", fontSize: "30px", color: "#fafafa", fontFamily: "var(--font-kiwi-maru)" }} // 画像の比率に合わせて調整
       >
         {/* 背景のテンプレート画像 */}
-        <img 
-          src="/template.png" 
-          alt="profu-template" 
+        <img
+          src="/template.png"
+          alt="profu-template"
           className="absolute inset-0 w-full h-full object-contain"
         />
 
-        {/* 重ねるテキスト：名前 */}
-        <div 
-          className="absolute text-xl font-bold text-gray-800"
-          style={{ 
-            top: "16.5%",
-            left: "20%",
+        <div
+          className="absolute"
+          style={{
+            top: "15%",
+            left: "6%",
           }}
         >
           {name}
         </div>
 
-        {/* 重ねるテキスト：趣味 */}
-        <div 
-          className="absolute text-lg text-gray-700"
-          style={{ 
-            top: "38%", 
-            left: "20%", 
+        <div
+          className="absolute"
+          style={{
+            top: "35%",
+            left: "6%",
           }}
         >
-          {hobby}
+          {like}
+        </div>
+
+        <div
+          className="absolute"
+          style={{
+            top: "67%",
+            left: "6%",
+          }}
+        >
+          {hate}
         </div>
       </div>
     </main>
