@@ -46,18 +46,39 @@ export default function Home() {
 
   const onDownload = async () => {
     if (!elementRef.current) return;
+    
+    const element = elementRef.current;
+    
+    // 現在のスタイルを保存
+    const originalTransform = element.style.transform;
+    
     try {
-      const dataUrl = await toPng(elementRef.current, { cacheBust: true, pixelRatio: 2 });
+      // 1. 撮影のために一時的に縮小を解除（1倍に戻す）
+      element.style.transform = "none";
+
+      // 2. 画像を生成
+      const dataUrl = await toPng(element, { 
+        cacheBust: true, 
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        // キャプチャ範囲を厳密に指定
+        width: 810,
+        height: 1440,
+      });
+
+      // 3. 元の表示（0.5倍）に戻す
+      element.style.transform = originalTransform;
+
       const link = document.createElement("a");
       link.download = "my-profile.png";
       link.href = dataUrl;
       link.click();
     } catch (err) {
+      element.style.transform = originalTransform;
       console.error("生成失敗", err);
     }
   };
 
-  // 入力更新用のショートカット関数
   const updateField = (field: string) => (value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -69,7 +90,7 @@ export default function Home() {
       <div className="flex flex-col lg:flex-row items-start justify-center gap-6 max-w-6xl mx-auto">
         
         {/* --- 左側：入力エリア --- */}
-        <div className="w-full lg:w-[400px] lg:sticky lg:top-4 bg-white p-6 rounded-xl shadow-md flex flex-col gap-4">
+        <div className="w-full lg:w-[400px] lg:sticky lg:top-4 bg-white p-6 rounded-xl shadow-md flex flex-col gap-4 border border-gray-200">
           <h2 className="text-lg font-bold border-b pb-2">入力設定</h2>
           
           <InputField label="なまえ" value={formData.name} onChange={updateField("name")} />
@@ -86,24 +107,29 @@ export default function Home() {
         </div>
 
         {/* --- 右側：プレビューエリア --- */}
-        <div className="flex-1 flex justify-center overflow-hidden bg-gray-200 rounded-xl p-4">
-          <div
-            ref={elementRef}
-            className="relative bg-white shadow-2xl origin-top"
-            style={{
-              width: "810px",
-              height: "1440px",
-              color: "#fafafa",
-              fontFamily: "var(--font-kiwi-maru)",
-              zoom: "0.5" // 0.7で切れる場合は少し小さくするか親のmin-hを調整
-            }}
-          >
-            <img src="/template.png" alt="" className="absolute inset-0 w-full h-full object-contain" />
+        <div className="flex-1 flex justify-center bg-gray-200 rounded-xl p-8 overflow-hidden border border-gray-300">
+          {/* この外側の div が「0.5倍になった後のサイズ」を担当します。
+            これがないと、ページ上に 810x1440 の巨大な空白が残ってしまいます。
+          */}
+          <div style={{ width: "405px", height: "720px", position: "relative" }}>
+            <div
+              ref={elementRef}
+              className="absolute top-0 left-0 bg-white shadow-2xl origin-top-left"
+              style={{
+                width: "810px",
+                height: "1440px",
+                color: "#fafafa",
+                fontFamily: "var(--font-kiwi-maru)",
+                transform: "scale(0.5)", // zoomの代わりにscaleを使用
+              }}
+            >
+              <img src="/template.png" alt="" className="absolute inset-0 w-full h-full object-contain" />
 
-            <PreviewText content={formData.name} top="10.5%" />
-            <PreviewText content={formData.like} top="27%" />
-            <PreviewText content={formData.hate} top="53%" />
-            <PreviewText content={formData.comment} top="78.5%" />
+              <PreviewText content={formData.name} top="10.5%" />
+              <PreviewText content={formData.like} top="27%" />
+              <PreviewText content={formData.hate} top="53%" />
+              <PreviewText content={formData.comment} top="78.5%" />
+            </div>
           </div>
         </div>
       </div>
