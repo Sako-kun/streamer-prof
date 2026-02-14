@@ -13,7 +13,7 @@ export default function Home() {
 
 try {
       // プレビューエリアをPNGデータに変換
-      const dataUrl = await toPng(elementRef.current, { cacheBust: true });
+      const dataUrl = await toPng(elementRef.current, { cacheBust: true, pixelRatio: 2});
       
       // ダウンロード用のリンクを作ってクリックさせる
       const link = document.createElement("a");
