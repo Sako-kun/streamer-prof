@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Streamer Profile Card Generator 📋✨
 
-## Getting Started
+Next.js と Tailwind CSS で構築した、ストリーマー・VTuber向けの「プロフ帳」画像生成ツールです。
+左側の入力フォームでリアルタイムに編集し、理想のプロフ画像をワンタップで書き出せます。
 
-First, run the development server:
+## 🚀 特徴
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **リアルタイム・プレビュー**: 入力した内容がその場で 1600×900（または 810×1440）の高品質キャンバスに反映されます。
+- **レスポンシブ・レイアウト**: 
+  - PCでは「左に入力、右にプレビュー」のサイドバー方式を採用。
+  - `Sticky` 指定により、長い項目を入力中もプレビューが画面内に固定されます。
+- **高画質書き出し**: `html-to-image` を使用。`pixelRatio: 2` 設定により、SNS投稿にも耐えうるクッキリとした画像を生成します。
+- **コンポーネント設計**: React のパーツ化（`InputField`, `PreviewText`）により、項目の追加やスタイルの変更が容易です。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠 使用技術
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Tailwind CSS
+- **Library**: `html-to-image` (DOM to PNG 変換)
+- **Fonts**: Google Fonts (Kiwi Maru / Zen Kurenaido 等)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 フォルダ構造
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+src/
+ ├── app/
+ │    ├── layout.tsx    # Google Fonts の読み込み設定
+ │    └── page.tsx      # メインロジック、コンポーネント、UI
+ └── public/
+      └── template.png  # 背景となるプロフ帳のテンプレート画像
