@@ -19,11 +19,11 @@ const CONFIG = {
     { key: "relate", label: "人間関係の話", top: 590 },
   ] as const,
   TEXT_ITEMS: [
-    { key: "name", label: "活動者名", type: "text", top: 38, left: 310, fontSize: 32, width: 400 },
+    { key: "name", label: "活動者名", type: "text", top: 35, left: 310, fontSize: 32, width: 400, height: 50 },
     { key: "anime", label: "語れるアニメ", type: "auto-size-area", top: 180, left: 44, width: 180, height: 60, baseFontSize: 28 },
-    { key: "manga", label: "マンガ派？アニメ派？", type: "select", options: ["マンガ派", "アニメ派", "どっちも!!"], top: 190, left: 275, width: 180, fontSize: 30 },
+    { key: "manga", label: "マンガ派？アニメ派？", type: "select", options: ["マンガ派", "アニメ派", "どっちも!!"], top: 185, left: 275, width: 180, fontSize: 30, height: 50 },
     { key: "music", label: "音楽ジャンル", type: "auto-size-area", top: 340, left: 43, width: 180, height: 60, baseFontSize: 30 },
-    { key: "style", label: "ゲームスタイル", type: "select", options: ["いのちだいじに", "ガンガンいこうぜ", "効率重視", "エンジョイ派"], top: 350, left: 275, width: 180, fontSize: 22 },
+    { key: "style", label: "ゲームスタイル", type: "select", options: ["いのちだいじに", "ガンガンいこうぜ", "効率重視", "エンジョイ派"], top: 340, left: 275, width: 180, fontSize: 22, height: 50 },
   ] as const,
   RATING_X_POSITIONS: [757, 791, 827, 861, 896],
 };
@@ -46,7 +46,7 @@ const AutoSizeText = ({ content, baseFontSize }: { content: string, baseFontSize
 
 export default function CollabNote() {
   const [data, setData] = useState<Record<string, any>>({
-    name: "うにのれむ", anime: "名探偵コナン", manga: "アニメ派", music: "ボカロ", style: "いのちだいじに",
+    name: "うにのれむ", anime: "名探偵コナン", manga: "アニメ派", music: "ボカロ", style: "いのちだいじに"
   });
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +55,10 @@ export default function CollabNote() {
   const download = async () => {
     if (!previewRef.current) return;
     const el = previewRef.current;
+    
+    // Vercel(本番環境)でフォントを確実に読み込ませるための待機
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const oldTransform = el.style.transform;
     el.style.transform = "none";
     const url = await toPng(el, { pixelRatio: 2, cacheBust: true });
@@ -65,16 +69,15 @@ export default function CollabNote() {
 
   return (
     <main className="min-h-screen bg-stone-100 p-6 flex gap-8 flex-wrap justify-center font-sans">
-      {/* 入力UI */}
       <div className="w-[400px] bg-white rounded-2xl shadow-xl p-6 space-y-4 h-fit border border-stone-200">
         <h2 className="text-xl font-bold text-stone-800 border-b pb-2">設定</h2>
-        {CONFIG.TEXT_ITEMS.map(item => (
+        {CONFIG.TEXT_ITEMS.map((item: any) => (
           <div key={item.key} className="space-y-1">
             <label className="text-xs font-bold text-stone-800 uppercase">{item.label}</label>
             {item.type === "select" ? (
               <select className="w-full border border-gray-400 rounded-lg p-2 text-sm bg-stone-50 text-gray-900 font-medium"
                 value={data[item.key]} onChange={e => update(item.key, e.target.value)}>
-                {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                {item.options.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
               </select>
             ) : (item.type === "auto-size-area") ? (
               <textarea className="w-full border border-gray-400 rounded-lg p-2 text-sm text-gray-900 font-medium"
@@ -89,7 +92,7 @@ export default function CollabNote() {
             )}
           </div>
         ))}
-        {/* ステータス */}
+        
         <div className="pt-4 space-y-3 border-t">
           <label className="text-xs font-bold text-stone-500 uppercase block">ステータス</label>
           {CONFIG.STATUS_ITEMS.map(item => (
@@ -106,17 +109,16 @@ export default function CollabNote() {
         <button onClick={download} className="w-full bg-amber-700 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-amber-800 transition">画像を保存する</button>
       </div>
 
-      {/* プレビュー */}
       <div className="p-4 bg-stone-300 rounded-3xl shadow-inner h-fit">
         <div style={{ width: CONFIG.CANVAS.width * CONFIG.CANVAS.scale, height: CONFIG.CANVAS.height * CONFIG.CANVAS.scale }}>
           <div ref={previewRef} className="relative origin-top-left bg-white shadow-2xl" style={{ width: CONFIG.CANVAS.width, height: CONFIG.CANVAS.height, transform: `scale(${CONFIG.CANVAS.scale})`, fontFamily: 'var(--font-kiwi-maru), sans-serif' }}>
             <img src={CONFIG.CANVAS.bgUrl} className="absolute inset-0 w-full h-full object-cover" alt="" />
-            {CONFIG.TEXT_ITEMS.map(item => (
+            {CONFIG.TEXT_ITEMS.map((item: any) => (
               <div key={item.key} className="absolute flex items-center justify-center font-bold text-stone-900 text-center" style={{ top: item.top, left: item.left, width: item.width, height: item.height || "auto" }}>
                 {(item.type === "auto-size-area") ? (
-                  <AutoSizeText content={data[item.key] || ""} baseFontSize={(item as any).baseFontSize || 20} />
+                  <AutoSizeText content={data[item.key] || ""} baseFontSize={item.baseFontSize || 20} />
                 ) : (
-                  <div style={{ fontSize: `${(item as any).fontSize}px` }} className="whitespace-pre-wrap">{data[item.key]}</div>
+                  <div style={{ fontSize: `${item.fontSize}px` }} className="whitespace-pre-wrap">{data[item.key]}</div>
                 )}
               </div>
             ))}
