@@ -23,7 +23,7 @@ const CONFIG = {
     { key: "anime", label: "語れるアニメ", type: "auto-size-area", top: 180, left: 44, width: 180, height: 60, baseFontSize: 28 },
     { key: "manga", label: "マンガ派？アニメ派？", type: "select", options: ["マンガ派", "アニメ派", "どっちも!!"], top: 185, left: 275, width: 180, fontSize: 30, height: 50 },
     { key: "music", label: "音楽ジャンル", type: "auto-size-area", top: 340, left: 43, width: 180, height: 60, baseFontSize: 30 },
-    { key: "style", label: "ゲームスタイル", type: "select", options: ["いのちだいじに", "ガンガンいこうぜ", "効率重視", "エンジョイ派"], top: 340, left: 275, width: 180, fontSize: 22, height: 50 },
+    { key: "style", label: "ゲームスタイル", type: "select", options: ["いのちだいじに", "いろいろやろうぜ", "エンジョイ派", "ガンガンいこうぜ", "寄り道大好き", "効率重視", "司令塔型"], top: 340, left: 275, width: 180, fontSize: 22, height: 50 },
   ] as const,
   RATING_X_POSITIONS: [757, 791, 827, 861, 896],
 };
