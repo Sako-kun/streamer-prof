@@ -191,7 +191,7 @@ export default function CollabNote() {
             <img src={CONFIG.CANVAS.bgUrl} className="absolute inset-0 w-full h-full object-cover" alt="" />
 
             {/* 左下：診断結果画像（平均値とスタイルで動的に変化） */}
-            <div className="absolute" style={{ bottom: "-50px", left: "40px", width: "380px", height: "380px" }}>
+            <div className="absolute" style={{ bottom: "-70px", left: "40px", width: "400px", height: "400px" }}>
               <img src={result.imagePath} alt="" className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.opacity = "0")} />
             </div>
 
