@@ -148,7 +148,7 @@ export default function CollabNote() {
     const el = previewRef.current;
     await new Promise((resolve) => setTimeout(resolve, 500));
     const oldTransform = el.style.transform;
-    el.style.transform = "none"; 
+    el.style.transform = "none";
     const url = await toPng(el, { pixelRatio: 2, cacheBust: true });
     el.style.transform = oldTransform;
     const a = document.createElement("a");
@@ -203,10 +203,20 @@ export default function CollabNote() {
         <button onClick={download} className="w-full bg-amber-700 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-amber-800 transition">画像を保存する</button>
       </div>
 
-      {/* --- 右側：画像プレビュー（この中身が画像になる） --- */}
-      <div className="p-4 bg-stone-300 rounded-3xl shadow-inner h-fit">
-        <div style={{ width: CONFIG.CANVAS.width * CONFIG.CANVAS.scale, height: CONFIG.CANVAS.height * CONFIG.CANVAS.scale }}>
-          <div ref={previewRef} className="relative origin-top-left bg-white shadow-2xl" style={{ width: CONFIG.CANVAS.width, height: CONFIG.CANVAS.height, transform: `scale(${CONFIG.CANVAS.scale})`, fontFamily: 'var(--font-kiwi-maru), sans-serif' }}>
+      {/* --- 右側：画像プレビュー（スマホでは横幅いっぱいに収める） --- */}
+      <div className="p-4 bg-stone-300 rounded-3xl shadow-inner h-fit w-full max-w-[1040px] overflow-hidden">
+        {/* 画面幅に応じて高さを保つためのラッパー */}
+        <div className="relative w-full" style={{ aspectRatio: '1000 / 707' }}>
+          <div ref={previewRef} className="absolute top-0 left-0 origin-top-left bg-white shadow-2xl"
+            style={{
+              width: '1000px',
+              height: '707px',
+              // ★ 画面の幅(100%)を1000pxで割った倍率に自動スケール
+              transform: `scale(calc(100vw / 1000 * 0.9))`,
+              // ※ 0.9は余白分。もし左右がギリギリなら 100vw を調整してください。
+              // PCなど大きな画面では scale(1) 以上にならないように工夫も可能です。
+              fontFamily: 'var(--font-kiwi-maru), sans-serif'
+            }}>
 
             {/* [レイヤー1] テンプレート背景画像 */}
             <img src={CONFIG.CANVAS.bgUrl} className="absolute inset-0 w-full h-full object-cover" alt="" />
@@ -227,7 +237,7 @@ export default function CollabNote() {
             }}>
               {/* 診断結果の名前（大きく別のフォントを使いたい場合はここを編集） */}
               <div style={{
-                fontSize: "32px",      
+                fontSize: "32px",
                 fontWeight: "900",
                 color: "#1a1a1a",
                 fontFamily: "serif",    // 使用フォント
