@@ -163,7 +163,7 @@ export default function CollabNote() {
     <main className="min-h-screen bg-stone-100 p-6 flex gap-8 flex-wrap justify-center font-sans">
 
       {/* --- 左側：操作パネル（入力フォーム） --- */}
-      <div className="w-[400px] bg-white rounded-2xl shadow-xl p-6 space-y-4 h-fit border border-stone-200">
+      <div className="w-full max-w-[400px] bg-white rounded-2xl shadow-xl p-6 space-y-4 h-fit border border-stone-200">
         <h2 className="text-xl font-bold text-stone-800 border-b pb-2">設定</h2>
 
         {/* テキスト入力項目の生成 */}
