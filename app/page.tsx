@@ -4,9 +4,16 @@ import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 
 // ============================================================
-// 1. マスターデータ・基本設定
+// 1. マスターデータ・基本設定（コンテンツの内容を変えたい時はここ）
 // ============================================================
 
+/**
+ * 診断結果の分岐データ
+ * * [編集ガイド]
+ * - name: プレビューに大きく表示される称号・職業名
+ * - text: その下の説明文
+ * - img: 使用する画像ファイル名のプレフィックス
+ */
 const RESULT_MASTER: Record<string, Record<string, { img: string; name: string; text: string }>> = {
   "いのちだいじに": {
     high: { img: "inochi", name: "僧侶", text: "他者の痛みに敏感で思いやりに長けている。" },
@@ -38,9 +45,16 @@ const RESULT_MASTER: Record<string, Record<string, { img: string; name: string; 
   }
 };
 
+/**
+ * キャンバスのレイアウト設定
+ * * [編集ガイド]
+ * - CANVAS: 背景画像のパスや基準サイズ
+ * - STATUS_ITEMS: 左側の項目のラベルと、背景画像上の「縦位置(top)」
+ * - TEXT_ITEMS: 自由入力項目の位置・サイズ・初期フォントサイズ
+ * - RATING_X_POSITIONS: 評価1〜5の丸印を描画する「横位置(left)」のリスト
+ */
 const CONFIG = {
-  // scale: 1.0 だと実寸(1000px)、画面に収まらない場合は 0.8 などに下げてください
-  CANVAS: { width: 1000, height: 707, scale: 1.0, bgUrl: "/template.png" },
+  CANVAS: { width: 1000, height: 707, scale: 1, bgUrl: "/template.png" },
 
   STATUS_ITEMS: [
     { key: "school", label: "学生時代の話", top: 200 },
@@ -68,13 +82,20 @@ const CONFIG = {
 };
 
 // ============================================================
-// 2. ユーティリティ・コンポーネント
+// 2. ユーティリティ・コンポーネント（仕組みの部分）
 // ============================================================
 
+/**
+ * テキスト自動リサイズ機能
+ * 枠からはみ出さないようにフォントサイズを計算します。
+ */
 const AutoSizeText = ({ content, baseFontSize }: { content: string, baseFontSize: number }) => {
   const text = content || "";
   const lineCount = text.split('\n').length;
-  let fontSize = text.length > 10 ? Math.max(10, baseFontSize * (10 / text.length)) : baseFontSize;
+  let fontSize = text.length > 10
+    ? Math.max(10, baseFontSize * (10 / text.length))
+    : baseFontSize;
+
   if (lineCount > 2) fontSize *= 0.85;
 
   return (
@@ -85,10 +106,11 @@ const AutoSizeText = ({ content, baseFontSize }: { content: string, baseFontSize
 };
 
 // ============================================================
-// 3. メインコンポーネント
+// 3. メインロジック
 // ============================================================
 
 export default function CollabNote() {
+  // 入力フォームの状態管理
   const [data, setData] = useState<Record<string, any>>({
     name: "うにのれむ", anime: "名探偵コナン", manga: "アニメ派", music: "ボカロ", style: "いのちだいじに"
   });
@@ -96,6 +118,10 @@ export default function CollabNote() {
   const previewRef = useRef<HTMLDivElement>(null);
   const update = (key: string, val: any) => setData(p => ({ ...p, [key]: val }));
 
+  /**
+   * 診断判定ロジック
+   * 11項目の平均値が「3以上(High)」か「3未満(Low)」かで分岐させます。
+   */
   const getResultInfo = () => {
     const statusKeys = CONFIG.STATUS_ITEMS.map(item => item.key);
     const values = statusKeys.map(key => Number(data[key]) || 3);
@@ -114,24 +140,33 @@ export default function CollabNote() {
 
   const result = getResultInfo();
 
+  /**
+   * 画像書き出し処理
+   */
   const download = async () => {
     if (!previewRef.current) return;
     const el = previewRef.current;
     await new Promise((resolve) => setTimeout(resolve, 500));
     const oldTransform = el.style.transform;
-    el.style.transform = "none";
+    el.style.transform = "none"; 
     const url = await toPng(el, { pixelRatio: 2, cacheBust: true });
     el.style.transform = oldTransform;
     const a = document.createElement("a");
     a.download = "note.png"; a.href = url; a.click();
   };
 
-  return (
-    <main className="min-h-screen bg-stone-100 p-6 flex gap-8 flex-nowrap justify-center font-sans">
+  // ============================================================
+  // 4. UI描画
+  // ============================================================
 
-      {/* --- 左側：操作パネル --- */}
-      <div className="w-[400px] flex-shrink-0 bg-white rounded-2xl shadow-xl p-6 space-y-4 h-fit border border-stone-200">
+  return (
+    <main className="min-h-screen bg-stone-100 p-6 flex gap-8 flex-wrap justify-center font-sans">
+
+      {/* --- 左側：操作パネル（入力フォーム） --- */}
+      <div className="w-[400px] bg-white rounded-2xl shadow-xl p-6 space-y-4 h-fit border border-stone-200">
         <h2 className="text-xl font-bold text-stone-800 border-b pb-2">設定</h2>
+
+        {/* テキスト入力項目の生成 */}
         {CONFIG.TEXT_ITEMS.map((item: any) => (
           <div key={item.key} className="space-y-1">
             <label className="text-xs font-bold text-stone-800 uppercase">{item.label}</label>
@@ -149,7 +184,10 @@ export default function CollabNote() {
             )}
           </div>
         ))}
+
+        {/* ステータス選択（ボタン） */}
         <div className="pt-4 space-y-3 border-t">
+          <label className="text-xs font-bold text-stone-500 uppercase block">ステータス</label>
           {CONFIG.STATUS_ITEMS.map(item => (
             <div key={item.key} className="flex items-center justify-between text-sm">
               <span className="text-stone-700">{item.label}</span>
@@ -161,47 +199,64 @@ export default function CollabNote() {
             </div>
           ))}
         </div>
+
         <button onClick={download} className="w-full bg-amber-700 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-amber-800 transition">画像を保存する</button>
       </div>
 
-      {/* --- 右側：画像プレビュー (PC用固定表示) --- */}
-      <div className="p-4 bg-stone-300 rounded-3xl shadow-inner h-fit overflow-auto">
-        {/* キャンバスの外枠：scaleがかかった状態のサイズを計算して保持 */}
-        <div style={{ 
-          width: CONFIG.CANVAS.width * CONFIG.CANVAS.scale, 
-          height: CONFIG.CANVAS.height * CONFIG.CANVAS.scale 
-        }}>
-          <div ref={previewRef} className="relative origin-top-left bg-white shadow-2xl" 
-            style={{ 
-              width: `${CONFIG.CANVAS.width}px`, 
-              height: `${CONFIG.CANVAS.height}px`, 
-              transform: `scale(${CONFIG.CANVAS.scale})`, 
-              fontFamily: 'var(--font-kiwi-maru), sans-serif' 
-            }}>
+      {/* --- 右側：画像プレビュー（この中身が画像になる） --- */}
+      <div className="p-4 bg-stone-300 rounded-3xl shadow-inner h-fit">
+        <div style={{ width: CONFIG.CANVAS.width * CONFIG.CANVAS.scale, height: CONFIG.CANVAS.height * CONFIG.CANVAS.scale }}>
+          <div ref={previewRef} className="relative origin-top-left bg-white shadow-2xl" style={{ width: CONFIG.CANVAS.width, height: CONFIG.CANVAS.height, transform: `scale(${CONFIG.CANVAS.scale})`, fontFamily: 'var(--font-kiwi-maru), sans-serif' }}>
 
+            {/* [レイヤー1] テンプレート背景画像 */}
             <img src={CONFIG.CANVAS.bgUrl} className="absolute inset-0 w-full h-full object-cover" alt="" />
 
-            {/* 診断画像 */}
+            {/* [レイヤー2] 診断画像表示エリア */}
             <div className="absolute" style={{ bottom: "30px", left: "0px", width: "230px", height: "230px" }}>
               <img src={result.imagePath} className="w-full h-full object-contain" onError={(e) => (e.currentTarget.style.opacity = "0")} />
             </div>
 
-            {/* 称号と説明文 */}
-            <div className="absolute" style={{ bottom: "90px", left: "250px", width: "200px", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div style={{ fontSize: "32px", fontWeight: "900", color: "#1a1a1a", fontFamily: "serif", lineHeight: "1.1" }}>
+            {/* [レイヤー3] 診断結果：称号と説明文テキストエリア */}
+            <div className="absolute" style={{
+              bottom: "90px",
+              left: "250px",
+              width: "200px",
+              display: "flex",
+              flexDirection: "column", // 縦に並べる
+              gap: "8px"               // 称号と説明の間の隙間
+            }}>
+              {/* 診断結果の名前（大きく別のフォントを使いたい場合はここを編集） */}
+              <div style={{
+                fontSize: "32px",      
+                fontWeight: "900",
+                color: "#1a1a1a",
+                fontFamily: "serif",    // 使用フォント
+                lineHeight: "1.1"
+              }}>
                 {result.resultName}
               </div>
-              <div style={{ fontSize: "18px", fontWeight: "bold", lineHeight: "1.4", color: "#444", fontFamily: "var(--font-kiwi-maru), sans-serif" }}>
+
+              {/* 診断結果の説明文 */}
+              <div style={{
+                fontSize: "18px",
+                fontWeight: "bold",
+                lineHeight: "1.4",
+                color: "#444",
+                fontFamily: "var(--font-kiwi-maru), sans-serif"
+              }}>
                 <p className="whitespace-pre-wrap text-left">{result.description}</p>
               </div>
             </div>
 
-            {/* 各種テキスト項目 */}
+            {/* [レイヤー4] 自由入力された各種テキスト（活動者名、アニメなど） */}
             {CONFIG.TEXT_ITEMS.map((item: any) => {
               const isName = item.key === "name";
               return (
-                <div key={item.key} className={`absolute flex items-center font-bold text-stone-900 ${isName ? "justify-start pl-4" : "justify-center text-center"}`}
-                  style={{ top: item.top, left: item.left, width: item.width, height: item.height || "auto" }}>
+                <div
+                  key={item.key}
+                  className={`absolute flex items-center font-bold text-stone-900 ${isName ? "justify-start pl-4" : "justify-center text-center"}`}
+                  style={{ top: item.top, left: item.left, width: item.width, height: item.height || "auto" }}
+                >
                   {(item.type === "auto-size-area") ? (
                     <AutoSizeText content={data[item.key] || ""} baseFontSize={item.baseFontSize || 20} />
                   ) : (
@@ -211,10 +266,12 @@ export default function CollabNote() {
               );
             })}
 
-            {/* ステータス丸印 */}
+            {/* [レイヤー5] ステータス丸印（評価に応じた位置へ配置） */}
             {CONFIG.STATUS_ITEMS.map(item => (
               data[item.key] && (
-                <div key={item.key} className="absolute w-[33px] h-[33px] bg-gradient-to-br from-yellow-200 to-amber-400 rounded-full shadow-[0_0_12px_rgba(251,191,36,0.9)] border border-white/50"
+                <div
+                  key={item.key}
+                  className="absolute w-[33px] h-[33px] bg-gradient-to-br from-yellow-200 to-amber-400 rounded-full shadow-[0_0_12px_rgba(251,191,36,0.9)] border border-white/50"
                   style={{ top: item.top, left: CONFIG.RATING_X_POSITIONS[data[item.key] - 1] }}
                 />
               )
